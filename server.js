@@ -11,11 +11,10 @@ const app = express();
 
 app.use(cors());
 
-//Takes in user location query and returns a formatted location data object to City Explorer.
+//Takes in user location query and returns a formatted location data object to City Explorer front end.
 app.get('/location', (request,response) => {
   const locationData = searchLatLong(request.query.data);
   if(request.query.data === 'seattle'){
-    loadData();
     response.send(locationData);
   }
   else{
@@ -24,19 +23,20 @@ app.get('/location', (request,response) => {
 });
 
 
-function loadData(){
-  app.get('/weather', (request,response)=>{
-    // darksky.json only has one entry - no need for latitude or longitude at the moment
-    // const weatherData = searchWeather(object.latitude, object.longitude);
-    const weatherData = searchWeather();
-    if(weatherData){
-      response.send(weatherData);
-    }
-    else{
-      response.send(new APIError(500, 'Sorry, something went wrong'));
-    }
-  })
-}
+//Takes in user location query, retrieves daily weather data, and serves formatted daily weather data
+// to City Explorer front end application.
+app.get('/weather', (request,response)=>{
+  // darksky.json only has one entry - no need for latitude or longitude at the moment
+  // const weatherData = searchWeather(object.latitude, object.longitude);
+  const weatherData = searchWeather();
+  if(weatherData){
+    response.send(weatherData);
+  }
+  else{
+    response.send(new APIError(500, 'Sorry, something went wrong'));
+  }
+});
+
 
 //translate location query to latitude and longitude data
 function searchLatLong(query){
