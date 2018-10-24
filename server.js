@@ -81,7 +81,6 @@ function searchWeather(queryData){
 function searchYelp(queryData) {
   const yelpURL = `https://api.yelp.com/v3/businesses/search?location=${queryData.formatted_query}`;
   // latitude=${queryData.latitude},longitude=${queryData.longitude}`;
-  console.log('requested yelp data');
   return superagent
     .get(yelpURL) 
     .set('Authorization', `Bearer ${YELP_KEY}`)
@@ -99,7 +98,23 @@ function searchYelp(queryData) {
 }
 
 function searchMovieDB(queryData) {
-  const moveiDBURL = `https://api.themoveidb.org/3/search/movie?api_key=${process.env.MOVIEDB_API_KEY}&query=`
+  const city = queryData.formatted_query.split(',')[0];
+  const movieDBURL = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIEDB_API_KEY}&language=en-US&query=${city}&page=1&include_adult=false`;
+  console.log('requesting data from movieDB');
+  return superagent
+    .get(movieDBURL)
+    .then(movieData => {
+      if (!movieData.body.results.length) {
+        throw 'no businesses returned by movieDB';
+      } else {
+        const movieResults = movieData.body.results.map(function(movie) {
+          return new MovieResult(movie);
+        });
+        console.log(movieResults);
+        return movieResults;
+      }
+    })
+    .catch(error => handleError(error));
 }
 
 //Constructor function for Location objects
@@ -122,6 +137,16 @@ function YelpResult(data) {
   this.price = data.price;
   this.rating = data.rating;
   this.url = data.url;
+}
+
+function MovieResult(data) {
+  this.title = data.title;
+  this.overview = data.overview;
+  this.average_votes = data.vote_average;
+  this.total_votes = data.vote_count;
+  this.image_url = `https://image.tmdb.org/t/p/w500${data.poster_path}`;
+  this.popularity = data.popularity;
+  this.released_on = data.release_date;
 }
 
 //Constructor function for APIError objects - returns a status and response
