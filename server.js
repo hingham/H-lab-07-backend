@@ -7,10 +7,6 @@ const superagent = require('superagent');
 require('dotenv').config();
 
 const PORT = process.env.PORT;
-const WEATHER_KEY = process.env.DARKSKY_API_KEY;
-const MAPS_KEY = process.env.GOOGLE_MAPS_API_KEY;
-const YELP_KEY = process.env.YELP_API_KEY;
-const MOVIE_KEY = process.env.MOVIEDB_API_KEY;
 
 const app = express();
 
@@ -47,7 +43,7 @@ app.get('/movies', (request, response) => {
 
 //translate location query to latitude and longitude data
 function searchLatLong(queryData){
-  const mapsURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${queryData}&key=${MAPS_KEY}`;
+  const mapsURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${queryData}&key=${process.env.GOOGLE_MAPS_API_KEY}`;
   return superagent.get(mapsURL)
     .then( data => {
       if(!data.body.results.length) {
@@ -62,7 +58,7 @@ function searchLatLong(queryData){
 }
 
 function searchWeather(queryData){
-  const weatherURL = `https://api.darksky.net/forecast/${WEATHER_KEY}/${queryData.latitude},${queryData.longitude}`;
+  const weatherURL = `https://api.darksky.net/forecast/${process.env.DARKSKY_API_KEY}/${queryData.latitude},${queryData.longitude}`;
   return superagent
     .get(weatherURL) 
     .then(weatherData => {
@@ -83,7 +79,7 @@ function searchYelp(queryData) {
   // latitude=${queryData.latitude},longitude=${queryData.longitude}`;
   return superagent
     .get(yelpURL) 
-    .set('Authorization', `Bearer ${YELP_KEY}`)
+    .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
     .then(yelpData => {
       if (!yelpData.body.businesses.length) {
         throw 'no businesses returned by yelp';
