@@ -1,0 +1,26 @@
+{
+  "name": "lab-07-back-end-301",
+  "version": "1.0.0",
+  "description": "Repository for Lab-07 in 301d39: Hannah Ingham and Richard Flinn (Wednesday) **Version**: 1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BehelitFam/lab-07-back-end-301.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BehelitFam/lab-07-back-end-301/issues"
+  },
+  "homepage": "https://github.com/BehelitFam/lab-07-back-end-301#readme",
+  "dependencies": {
+    "cors": "^2.8.4",
+    "dotenv": "^6.1.0",
+    "express": "^4.16.4"
+  }
+}
