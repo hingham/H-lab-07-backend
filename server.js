@@ -11,6 +11,7 @@ const app = express();
 
 app.use(cors());
 
+//Takes in user location query and returns a formatted location data object to City Explorer.
 app.get('/location', (request,response) => {
   const locationData = searchLatLong(request.query.data);
   if(request.query.data === 'seattle'){
@@ -21,7 +22,7 @@ app.get('/location', (request,response) => {
     response.send(new APIError(500, 'Something went wrong'));
   }
 });
-// .then(console.log('before loadData'),console.log('failed at')).then(loadData());
+
 
 function loadData(){
   app.get('/weather', (request,response)=>{
