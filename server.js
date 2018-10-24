@@ -49,10 +49,9 @@ function searchLatLong(query){
 //function searchWeather(lat, long)
 function searchWeather(){
   const weatherData = require('./data/darksky.json');
-  let allDays = [];
-  for(let i = 0; i < weatherData.daily.data.length; i++){
-    allDays.push(new DayWeather(weatherData.daily.data[i]));
-  }
+  const allDays = weatherData.daily.data.map(function(daysData, index) {
+    return new DayWeather(daysData);
+  });
   return allDays;
 }
 
