@@ -7,10 +7,6 @@ const superagent = require('superagent');
 require('dotenv').config();
 
 const PORT = process.env.PORT;
-const WEATHER_KEY = process.env.DARKSKY_API_KEY;
-const MAPS_KEY = process.env.GOOGLE_MAPS_API_KEY;
-const YELP_KEY = process.env.YELP_API_KEY;
-const MOVIE_KEY = process.env.MOVIEDB_API_KEY;
 
 const app = express();
 
@@ -47,7 +43,7 @@ app.get('/movies', (request, response) => {
 
 //translate location query to latitude and longitude data
 function searchLatLong(queryData){
-  const mapsURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${queryData}&key=${MAPS_KEY}`;
+  const mapsURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${queryData}&key=${process.env.GOOGLE_MAPS_API_KEY}`;
   return superagent.get(mapsURL)
     .then( data => {
       if(!data.body.results.length) {
@@ -62,7 +58,7 @@ function searchLatLong(queryData){
 }
 
 function searchWeather(queryData){
-  const weatherURL = `https://api.darksky.net/forecast/${WEATHER_KEY}/${queryData.latitude},${queryData.longitude}`;
+  const weatherURL = `https://api.darksky.net/forecast/${process.env.DARKSKY_API_KEY}/${queryData.latitude},${queryData.longitude}`;
   return superagent
     .get(weatherURL) 
     .then(weatherData => {
@@ -81,10 +77,9 @@ function searchWeather(queryData){
 function searchYelp(queryData) {
   const yelpURL = `https://api.yelp.com/v3/businesses/search?location=${queryData.formatted_query}`;
   // latitude=${queryData.latitude},longitude=${queryData.longitude}`;
-  console.log('requested yelp data');
   return superagent
     .get(yelpURL) 
-    .set('Authorization', `Bearer ${YELP_KEY}`)
+    .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
     .then(yelpData => {
       if (!yelpData.body.businesses.length) {
         throw 'no businesses returned by yelp';
@@ -99,7 +94,23 @@ function searchYelp(queryData) {
 }
 
 function searchMovieDB(queryData) {
-  const moveiDBURL = `https://api.themoveidb.org/3/search/movie?api_key=${process.env.MOVIEDB_API_KEY}&query=`
+  const city = queryData.formatted_query.split(',')[0];
+  const movieDBURL = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIEDB_API_KEY}&language=en-US&query=${city}&page=1&include_adult=false`;
+  console.log('requesting data from movieDB');
+  return superagent
+    .get(movieDBURL)
+    .then(movieData => {
+      if (!movieData.body.results.length) {
+        throw 'no businesses returned by movieDB';
+      } else {
+        const movieResults = movieData.body.results.map(function(movie) {
+          return new MovieResult(movie);
+        });
+        console.log(movieResults);
+        return movieResults;
+      }
+    })
+    .catch(error => handleError(error));
 }
 
 //Constructor function for Location objects
@@ -122,6 +133,16 @@ function YelpResult(data) {
   this.price = data.price;
   this.rating = data.rating;
   this.url = data.url;
+}
+
+function MovieResult(data) {
+  this.title = data.title;
+  this.overview = data.overview;
+  this.average_votes = data.vote_average;
+  this.total_votes = data.vote_count;
+  this.image_url = `https://image.tmdb.org/t/p/w500${data.poster_path}`;
+  this.popularity = data.popularity;
+  this.released_on = data.release_date;
 }
 
 //Constructor function for APIError objects - returns a status and response
