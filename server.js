@@ -43,7 +43,7 @@ app.get('/movies', (request, response) => {
 
 //translate location query to latitude and longitude data
 function searchLatLong(queryData){
-  const mapsURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${queryData}&key=${process.env.GOOGLE_MAPS_API_KEY}`;
+  const mapsURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${queryData}&key=${process.env.GEOCODE_API_KEY}`;
   return superagent.get(mapsURL)
     .then( data => {
       if(!data.body.results.length) {
@@ -95,7 +95,7 @@ function searchYelp(queryData) {
 
 function searchMovieDB(queryData) {
   const city = queryData.formatted_query.split(',')[0];
-  const movieDBURL = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIEDB_API_KEY}&language=en-US&query=${city}&page=1&include_adult=false`;
+  const movieDBURL = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&language=en-US&query=${city}&page=1&include_adult=false`;
   console.log('requesting data from movieDB');
   return superagent
     .get(movieDBURL)
